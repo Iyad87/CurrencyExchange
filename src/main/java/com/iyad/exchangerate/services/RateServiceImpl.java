@@ -6,6 +6,7 @@ import com.iyad.exchangerate.enums.ExchangeRateTrend;
 import com.iyad.exchangerate.exceptions.InvalidParameterException;
 import com.iyad.exchangerate.model.Rate;
 import com.iyad.exchangerate.repositories.RateRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,6 +36,7 @@ public class RateServiceImpl implements RateService {
         this.rateRepository = rateRepository;
     }
 
+    @Scheduled(fixedDelay = 1000L)
     @Override
     public RateDTO getRate(String date, Currency baseCurrency, Currency targetCurrency) {
 
