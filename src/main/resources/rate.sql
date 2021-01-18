@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS billionaires;
+
+CREATE TABLE rate (
+  id INT AUTO_INCREMENT  PRIMARY KEY
+);

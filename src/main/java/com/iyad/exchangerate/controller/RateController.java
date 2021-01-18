@@ -1,8 +1,12 @@
 package com.iyad.exchangerate.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.iyad.exchangerate.dto.RateDTO;
+import com.iyad.exchangerate.enums.Currency;
+import com.iyad.exchangerate.services.RateService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(RateController.BASE_URL)
@@ -12,6 +16,20 @@ public class RateController {
 
     public static final String BASE_URL = "/api/exchange-rate";
 
+
+    private final RateService rateService;
+
+    public RateController(RateService rateService) {
+        this.rateService = rateService;
+    }
+
+    @ApiOperation(value = "Retrieves the current rate, based on the base and target currency")
+    @GetMapping("/{date}/{baseCurrency}/{targetCurrency}")
+    @ResponseStatus(HttpStatus.OK)
+    public RateDTO getRate(@PathVariable String date, @PathVariable Currency baseCurrency, @PathVariable Currency targetCurrency) {
+
+        return rateService.getRate(date, baseCurrency, targetCurrency);
+    }
 
 
 }
