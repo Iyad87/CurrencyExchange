@@ -8,3 +8,4 @@ RUN mvn package
 
 EXPOSE 8086
 ENTRYPOINT ["java", "-jar", "exchangeRate.jar"]
+
