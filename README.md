@@ -27,4 +27,6 @@ mvn spring-boot:run
 ## Get Data from Database using @REST Controller
 
 ```
-http://localhost:8086/api/exchange-rate/2021-01-17/EUR/USD
+http://localhost:8086/rates
+
+http://localhost:8086/rates{id}

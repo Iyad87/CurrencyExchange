@@ -1,12 +1,97 @@
 package com.iyad.exchangerate.services;
 
-
 import com.iyad.exchangerate.dto.RateDTO;
 import com.iyad.exchangerate.enums.Currency;
+import com.iyad.exchangerate.enums.ExchangeRateTrend;
+import com.iyad.exchangerate.model.Rate;
+import com.iyad.exchangerate.repositories.RateListRepository;
+import com.iyad.exchangerate.repositories.RateRepository;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-public interface RateService {
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
-    RateDTO getRate(String date, Currency baseCurrency, Currency targetCurrency);
+
+@Service
+@EnableScheduling
+public class RateService {
+
+
+    private static final int HOUR  = 60;
+    private Calendar calendar = Calendar.getInstance();
+    private RestTemplate restTemplate = new RestTemplate();
+    private RateDTO rateDTO = new RateDTO();
+
+    private final RateRepository rateRepository;
+    private final RateListRepository rateListRepository;
+
+
+    public RateService(RateRepository rateRepository, RateListRepository rateListRepository) {
+        this.rateRepository = rateRepository;
+        this.rateListRepository = rateListRepository;
+    }
+
+    @Scheduled(fixedRate = 10)
+    public  RateDTO getRate() {
+
+
+            // get exchangeRate for that date and set it on the DTO
+            Rate todayRate = restTemplate
+                    .getForObject("https://api.exchangeratesapi.io/" + "2020-05-05"+ "?base=" + Currency.EUR, Rate.class);
+            rateDTO.setExchangeRate(todayRate.getRates().get(Currency.USD));
+            // All successful queries should be persisted in the DB.
+            rateDTO.setId(null);
+            rateRepository.save(rateDTO);
+
+            // return DTO
+            return rateDTO;
+
+        }
+
+    public void  getRateList() {
+
+        Rate rate =  restTemplate.getForObject("https://api.exchangeratesapi.io/" +"2020-05-05" + "?base=" + Currency.EUR,
+                Rate.class);
+
+
+         rateListRepository.save(rate);
+
+    }
+
+    private ExchangeRateTrend calculateExchangeRateTrend(Currency targetCurrency, List<Rate> rates) {
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = 0; j < rates.size(); j++) {
+                if (rates.get(j).getRates().get(targetCurrency).compareTo(rates.get(j + 1).getRates().get(targetCurrency)) == i) {
+                    continue;
+                }
+                if (i == -1) {
+                    return ExchangeRateTrend.ASC;
+                } else if (i == 0) {
+                    return ExchangeRateTrend.CONS;
+                } else {
+                    return ExchangeRateTrend.DESC;
+                }
+            }
+        }
+        return ExchangeRateTrend.UNDEFINED;
+    }
+
+    private BigDecimal calculateAverageRate(Currency targetCurrency, List<Rate> rates) {
+
+        BigDecimal sumRates = BigDecimal.ZERO;
+
+        for (Rate rate : rates) {
+            sumRates = sumRates.add(rate.getRates().get((targetCurrency)));
+        }
+
+        return sumRates.divide(BigDecimal.valueOf(5), RoundingMode.UP);
+    }
 
 }
-
