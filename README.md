@@ -27,6 +27,4 @@ mvn spring-boot:run
 ## Get Data from Database using @REST Controller
 
 ```
-http://localhost:8086/rates
-
-http://localhost:8086/rates{id}
+http://localhost:8086/{date}/{EUR}/{USD}
