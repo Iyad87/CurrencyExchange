@@ -2,45 +2,32 @@ package com.iyad.exchangerate.controller;
 
 
 import com.iyad.exchangerate.dto.RateDTO;
-import com.iyad.exchangerate.model.Rate;
-import com.iyad.exchangerate.repositories.RateListRepository;
-import com.iyad.exchangerate.repositories.RateRepository;
+import com.iyad.exchangerate.enums.Currency;
+import com.iyad.exchangerate.services.RateService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+    @RestController
+    @RequestMapping(RateController.BASE_URL)
+    public class RateController {
 
-@RestController
-public class RateController {
+        public static final String BASE_URL = "/api/exchange-rate";
+        private final RateService rateService;
 
+        public RateController(RateService rateService) {
+            this.rateService = rateService;
+        }
 
+        @ApiOperation(value = "Retrieves the current rate, based on the base and target currency")
+        @GetMapping("/{date}/{baseCurrency}/{targetCurrency}")
+        @ResponseStatus(HttpStatus.OK)
+        public RateDTO getRate(@PathVariable String date, @PathVariable Currency baseCurrency, @PathVariable Currency targetCurrency) {
 
-
-    private final RateRepository rateRepository;
-    private final RateListRepository rateListRepository;
-
-
-
-    public RateController(RateRepository rateRepository, RateListRepository rateListRepository) {
-        this.rateRepository = rateRepository;
-        this.rateListRepository = rateListRepository;
+            return rateService.getRate(date, baseCurrency, targetCurrency);
+        }
     }
 
 
-    @GetMapping("/rates")
-    public Iterable<RateDTO> getAllRate(){
-        return rateRepository.findAll();
-    }
-
-    @GetMapping("/rates/{id}")
-    public Optional<RateDTO> getRateById(@PathVariable long id){
-        return rateRepository.findById(id);
-    }
-
-
-    @GetMapping("/ratesList")
-    public Iterable<Rate> getAllRateList(){
-        return rateListRepository.findAll();
-    }
-}
 
 

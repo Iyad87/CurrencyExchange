@@ -85,21 +85,21 @@
 
 	<profiles>
 		<profile>
-			<id>sonar</id>
-			<properties>
-				<sonar.sources>.</sonar.sources>
-				<sonar.inclusions>src/main/java/**,src/main/resources/**</sonar.inclusions>
-				<sonar.exclusions>${code.coverage.exclusions}</sonar.exclusions>
-				<sonar.projectKey>CurrencyExchange</sonar.projectKey>
-				<sonar.organization>CurrencyExchange</sonar.organization>
-				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-			</properties>
+			<id>dev</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>docker</id>
+			<properties>
+				<spring.profiles.active>docker</spring.profiles.active>
+			</properties>
 		</profile>
 	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -109,20 +109,14 @@
 					<finalName>exchangeRate</finalName>
 				</configuration>
 			</plugin>
-				<plugin>
-					<groupId>org.sonarsource.scanner.maven</groupId>
-					<artifactId>sonar-maven-plugin</artifactId>
-					<version>3.6.1.1688</version>
-					<executions>
-						<execution>
-							<phase>verify</phase>
-							<goals>
-								<goal>sonar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
 
 </project>
